@@ -6,3 +6,12 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+serde = "1.0.196"
+serde_json = "1.0.113"
+ureq = "2.9.4"
+# Find your dependencies in the Rust Standard Library API Documentation: https://crates.io/
+
+
+# cargo add ureq
+# cargo build
+# cargo run

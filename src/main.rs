@@ -1,49 +1,25 @@
-use serde::{Deserialize, Serialize};
+// main.rs
+mod domain;
+mod usecases;
+mod ports;
+
+use domain::Coin;
+use usecases::get_coin_price;
+use ports::CoinGeckoImpl;
 use std::io::stdin;
 
 fn main() {
-    let mut coin = String::new();
-    println!("¿Qué criptomoneda quieres consultar?");
+    let mut coin_name = String::new();
+    println!("Which cryptocurrency do you want to check?");
     let _ = stdin()
-        .read_line(&mut coin)
-        .expect("Ocurrió un error leyendo de stdin");
-    
-    coin = coin.to_lowercase();
+        .read_line(&mut coin_name)
+        .expect("An error occurred reading from stdin");
 
-
-    let result_precio = get_precio(&coin);
-    match result_precio {
-        Ok(precio) => println!("El precio es: ${}", precio),
-        Err(error) => println!("Error al buscar precio: {}", error),
+    let coin = Coin::new(&coin_name);
+    let api = CoinGeckoImpl;
+    let result_price = get_coin_price(coin, &api);
+    match result_price {
+        Ok(price) => println!("The price is: ${}", price),
+        Err(error) => println!("Error fetching price: {}", error),
     }
-}
-
-fn get_precio(coin: &str) -> Result<String, ureq::Error> {
-    let body: String = ureq::get(&format!(
-        "https://api.coingecko.com/api/v3/coins/{}?localization=false",
-        coin
-    ))
-    .call()?
-    .into_string()?;
-    let coin_data: CoinData = serde_json::from_str(&body).unwrap();
-    Ok(coin_data.market_data.current_price.usd.to_string())
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct CoinData {
-    id: String,
-    symbol: String,
-    name: String,
-    market_data: MarketData,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct MarketData {
-    current_price: Prices,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct Prices {
-    usd: f32,
-    clp: f32,
 }
